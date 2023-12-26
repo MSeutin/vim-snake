@@ -125,7 +125,9 @@ def main(stdscr):
 
             # check if endgame
             if quit_game:
-                endgame = end_game()
+                play_again = end_game()
+                if not play_again:
+                    endgame = True
                 break
         if endgame:
             break
