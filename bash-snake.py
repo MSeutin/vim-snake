@@ -59,10 +59,26 @@ def main(stdscr):
     # End game function 
     def end_game():
         # Display game over message
-        # Show final score
-        # Clean up or reset game state
-        # Offer quit or replay
-        pass
+        stdscr.clear()
+        game_over_msg = "G A M E  O V E R"
+        play_again = "Play Another Game (y / n) ?"
+
+        # Ensure the message positions are within the screen bounds
+        max_y, max_x = stdscr.getmaxyx()
+        game_over_msg_y = max_y // 2 - 1
+        play_again_y = max_y // 2 + 1
+
+        # Print the messages
+        stdscr.addstr(game_over_msg_y, (max_x - len(game_over_msg)) // 2, game_over_msg, bright_red)
+        stdscr.addstr(play_again_y, (max_x - len(play_again)) // 2, play_again)
+        stdscr.refresh() # refresh screen to display the messages
+
+        # Wait for 'y' or 'n' key press
+        while True:
+            response = stdscr.getch()
+            if response in [ord('y'), ord('Y'), ord('n'), ord('N')]:
+                return response in [ord('y'), ord('Y')]
+
 
     # Outer Loop for the entire program
     while True:
@@ -109,9 +125,12 @@ def main(stdscr):
 
             # check if endgame
             if quit_game:
-                end_game()
+                endgame = end_game()
                 break
-
+        if endgame:
+            break
+        else:
+            initialize_game()
 
 
 # Run the program
