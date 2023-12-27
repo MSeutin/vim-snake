@@ -15,13 +15,13 @@ def main(stdscr):
 
 
     # Initialization Function
-    def initialize_game():
+    def initialize_game(food, score, max_x, max_y):
         # set up the game state
-        stdscr.clear() # clear screen
-        max_y, max_x = stdscr.getmaxyx() # get screen size
         cur_y, cur_x = max_y // 2, max_x // 2 # center initial snake pos
         stdscr.addstr(cur_y, cur_x, ' ', bright_red)  # Draw the cursor in orange
-        return cur_x, cur_y
+        food = [cur_y - 3, cur_x + 3] 
+        stdscr.addstr(food[0], food[1], '@', curses.color_pair(3) | curses.A_BOLD)  # Draw the food in green
+        return cur_x, cur_y, food
         
 
     # Input handling Function
@@ -43,18 +43,21 @@ def main(stdscr):
     # Update Function
     def update_game():
         # Update screen
-        stdscr.refresh()
-        time.sleep(0.1)
-        stdscr.clear()
         # move snake
         # check for collisions
         # check and update food
         # return true if game over, else false
+        pass
 
     # Render Function
-    def render():
-        # display snake, food, and score on screen
-        pass
+    def render_game(cur_x, cur_y, food, score):
+        # Render snake
+        stdscr.addstr(cur_y, cur_x, ' ', bright_red)  # Draw the cursor in orange
+        # Render food
+        stdscr.addstr(food[0], food[1], '@', curses.color_pair(3) | curses.A_BOLD)  # Draw in green
+        # Render screen
+        # Render score
+        # Render controls
 
     # End game function 
     def end_game():
@@ -79,49 +82,66 @@ def main(stdscr):
             if response in [ord('y'), ord('Y'), ord('n'), ord('N')]:
                 return response in [ord('y'), ord('Y')]
 
+    def display_score(score, max_x):
+        # Display score (top middle)
+        score_text = f"Score: {score}"
+        score_x_pos = max_x // 2 - len(score_text) // 2
+        stdscr.addstr(0, score_x_pos, score_text, curses.color_pair(1))  # Display score
+    
+    def display_controls(max_y):
+        controls = [('q', ':Quit'), ('h', ':Left'), ('j', ':Down'), ('k', ':Up'), ('l', ':Right')]
+        x = 1
+        for key, text in controls:
+            stdscr.addstr(max_y - 1, x, key, curses.color_pair(3) | curses.A_BOLD)
+            x += len(key)
+            stdscr.addstr(max_y - 1, x, text)
+            x += len(text) + 2
+    
+    def display_logo(max_x, max_y):
+        # Display game name (bottom middle)
+        logo = "S N A K E  G A M E"
+        logo_x_pos = max_x // 2 - len(logo) // 2
+        stdscr.addstr(max_y-2, logo_x_pos, logo, curses.A_BOLD)
 
     # Outer Loop for the entire program
     while True:
         # variables
         endgame = False
+        score = 0
+        food = []
         max_y, max_x = stdscr.getmaxyx() # get window size
+        FRAME_RATE = 15
+        FRAME_DELAY = 1 / FRAME_RATE
 
         # Call Initialize Game Function
-        cur_x, cur_y = initialize_game()
+        cur_x, cur_y, food = initialize_game(food, score, max_x, max_y)
 
         # Inner Loop - Game Loop
         while not endgame:
-            stdscr.addstr(cur_y, cur_x, ' ', bright_red)  # Draw the cursor in orange
-
-            # function call
-            update_game()
-
-            # Display Score (top middle) & Game Name (bottom) 
-            score = 0
-            score_text = f"Score: {score}"
-            score_x_pos = max_x // 2 - len(score_text) // 2
-            game_name = "V I M  S N A K E"
-            game_name_x_pos = max_x // 2 - len(game_name) // 2
-            stdscr.addstr(0, score_x_pos, score_text, curses.color_pair(1))  # Display score
-            stdscr.addstr(max_y-2, game_name_x_pos, game_name, curses.A_BOLD) # Display game name
-        
-            # Display controls with keys in red
-            controls = [('q', ':Quit'), ('h', ':Left'), ('j', ':Down'),
-                    ('k', ':Up'), ('l', ':Right')]
-            x = 1
-            for key, text in controls:
-                stdscr.addstr(max_y - 1, x, key, curses.color_pair(3) | curses.A_BOLD)
-                x += len(key)
-                stdscr.addstr(max_y - 1, x, text)
-                x += len(text) + 2
-
+            # Clear the screen of all previously-printed characters
+            stdscr.clear()
+             
+            # Wait for next input
             try:
                 key = stdscr.getkey()
             except Exception:
-                key = ''
+                key = '' 
 
-            # call handle input function
+            # Function calls
             cur_x, cur_y, quit_game = input_handler(key, cur_x, cur_y, max_x, max_y)
+            update_game()
+            render_game(cur_x, cur_y, food, score) # Render the game
+            
+            # Display  Fixed Elements
+            display_logo(max_x, max_y) # display logo
+            display_score(score, max_x) # display score
+            display_controls(max_y) # display controls        
+            
+            # Refresh the screen to update its contents
+            stdscr.refresh()
+            
+            # Wait 1/10 of a second before repeating
+            time.sleep(FRAME_DELAY)
 
             # check if endgame
             if quit_game:
