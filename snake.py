@@ -8,7 +8,7 @@ class Snake:
         self.max_y, self.max_x = stdscr.getmaxyx()
         self.cur_y, self.cur_x = self.max_y // 2, self.max_x // 2
         # figure out where to put food
-        self.food = [self.cur_y - 3, self.cur_x + 3]
+        self.food = list()
         self.end_game = False
         self.score = 0
         self.FRAME_RATE = 15
@@ -22,9 +22,20 @@ class Snake:
         self.max_y, self.max_x = self.stdscr.getmaxyx()
         self.cur_y, self.cur_x = self.max_y // 2, self.max_x // 2 # center initial snake pos
         self.stdscr.addstr(self.cur_y, self.cur_x, ' ', self.bright_red)  # Draw the cursor in orange
-        self.food = [self.cur_y - 3, self.cur_x + 3] 
-        self.stdscr.addstr(self.food[0], self.food[1], '@', curses.color_pair(3) | curses.A_BOLD) 
+        self.place_food()
         self.stdscr.refresh() # refresh screen to display the messages
+
+    def place_food(self):
+        while True:
+            # get random x and y coordinates
+            x = random.randint(1, self.max_x - 3)
+            y = random.randint(1, self.max_y - 3)
+            # check if food is not on snake
+            if (x,y) != (self.cur_x, self.cur_y):
+                self.food = [y,x]
+                # render the food
+                self.stdscr.addstr(self.food[0], self.food[1], '@', curses.color_pair(3) | curses.A_BOLD)
+                break
 
     def input_handler(self, key):
         # Update cursor position based on key press
