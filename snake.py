@@ -26,22 +26,41 @@ class Snake:
 
     def initialize_game(self):
         self.stdscr.clear()
+        self.end_game = False
+        self.score = 0
+        self.snake_body = [(self.cur_y, self.cur_x)]
+        self.direction = 'right'
+        self.collision = False
+        self.game_speed = 1
         self.max_y, self.max_x = self.stdscr.getmaxyx()
         self.cur_y, self.cur_x = self.max_y // 2, self.max_x // 2 # center initial snake pos
+        self.snake_body = [(self.cur_y, self.cur_x)]
         self.place_food()
         self.stdscr.refresh() # refresh screen to display the messages
 
     def place_food(self):
         while True:
             # get random x and y coordinates
-            x = random.randint(1, self.max_x - 3)
             y = random.randint(1, self.max_y - 3)
+            x = random.randint(1, self.max_x - 3)
             # check if food is not on snake
-            if (x,y) != (self.cur_x, self.cur_y):
+            if (y,x) != (self.cur_y, self.cur_x):
                 self.food = [y,x]
                 # render the food
                 self.stdscr.addstr(self.food[0], self.food[1], '🍒', curses.color_pair(3) | curses.A_BOLD)
                 break
+
+    def snake_collision(self):
+        head_y, head_x = self.snake_body[0]
+        # check if snake collides with itself
+        if (head_y, head_x) in self.snake_body[1:]:
+            self.collision = True
+            return True
+        elif self.cur_y == 0 or self.cur_y == self.max_y - 1 or self.cur_x == 0 or self.cur_x == self.max_x - 1:
+            self.collision = True
+            return True
+        else:
+            return False
 
     def input_handler(self, key):
         # Update cursor position based on key press
@@ -75,6 +94,7 @@ class Snake:
         # update the snake body
         self.snake_body.insert(0, (self.cur_y, self.cur_x))
         # check for collisions
+        self.snake_collision()
         # check and update food
         # return true if game over, else false
 
@@ -106,6 +126,7 @@ class Snake:
             response = self.stdscr.getch()
             if response in [ord('y'), ord('Y')]:
                 self.end_game = False
+                self.collision = False
                 self.score = 0
                 self.initialize_game() # restart game
                 break

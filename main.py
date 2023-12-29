@@ -32,11 +32,15 @@ def main(stdscr):
         # Input Handling
         if snake.input_handler(key):
             snake.display_end_game_screen()
+            if snake.end_game:
+                break
+
+        # Check for snake collision
+        if snake.snake_collision():
+            snake.display_end_game_screen()
+            if snake.end_game:
+                break
             
-        # check end game condition
-        if snake.end_game:
-            break
-        
         # Update & Render Game
         snake.update_game()
         snake.render_game()
@@ -59,15 +63,13 @@ if __name__ == '__main__':
 # package into executable and ship and sell online
 # Optimize display_end_game_screen Method:
 
-# After displaying the end game screen and getting the player's response, you could directly handle the restart or termination of the game within this method, rather than using additional checks in the main loop.
 # Improve Readability:
-
 # Adding comments to each method explaining its purpose can greatly improve the readability of your code, especially for others reading it or for yourself when you come back to it later.
+
 # Game Loop Optimization:
-
 # Clearing the screen (stdscr.clear()) and refreshing (stdscr.refresh()) in every iteration could be optimized. Ideally, you should clear and refresh the screen only when there's something new to display. This might require a bit of restructuring in how and when you update the game state and render it.
-# Handling Key Presses:
 
+# Handling Key Presses:
 # The try-except block for key presses in the main loop is good, but you might want to handle specific exceptions (like curses.error) instead of a general Exception to avoid catching unintended exceptions.
 # Update Method:
 
