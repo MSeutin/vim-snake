@@ -7,21 +7,27 @@ class Snake:
         self.stdscr = stdscr
         self.max_y, self.max_x = stdscr.getmaxyx()
         self.cur_y, self.cur_x = self.max_y // 2, self.max_x // 2
-        # figure out where to put food
         self.food = list()
         self.end_game = False
         self.score = 0
-        self.FRAME_RATE = 15
+        self.snake_body = [(self.cur_y, self.cur_x)]
+        self.direction = 'right'
+        self.collision = False
+        self.game_speed = 1
+        self.FRAME_RATE = 5
         self.FRAME_DELAY = 1 / self.FRAME_RATE
-        # not sure the color below is correct
-        self.bright_red = curses.color_pair(2) | curses.A_BOLD
+        self.blue = curses.color_pair(1) | curses.A_BOLD
+        self.green = curses.color_pair(2) | curses.A_BOLD
+        self.yellow = curses.color_pair(3) | curses.A_BOLD
+        self.magenta = curses.color_pair(4) | curses.A_BOLD
+        self.cyan = curses.color_pair(5) | curses.A_BOLD
+        self.red = curses.color_pair(6) | curses.A_BOLD
         self.initialize_game()
 
     def initialize_game(self):
         self.stdscr.clear()
         self.max_y, self.max_x = self.stdscr.getmaxyx()
         self.cur_y, self.cur_x = self.max_y // 2, self.max_x // 2 # center initial snake pos
-        self.stdscr.addstr(self.cur_y, self.cur_x, ' ', self.bright_red)  # Draw the cursor in orange
         self.place_food()
         self.stdscr.refresh() # refresh screen to display the messages
 
@@ -34,37 +40,50 @@ class Snake:
             if (x,y) != (self.cur_x, self.cur_y):
                 self.food = [y,x]
                 # render the food
-                self.stdscr.addstr(self.food[0], self.food[1], '@', curses.color_pair(3) | curses.A_BOLD)
+                self.stdscr.addstr(self.food[0], self.food[1], '🍒', curses.color_pair(3) | curses.A_BOLD)
                 break
 
     def input_handler(self, key):
         # Update cursor position based on key press
-        if key == 'h' and self.cur_x > 0:
-            self.cur_x -= 1
-        elif key == 'l' and self.cur_x < self.max_x - 1:
-            self.cur_x += 1
-        elif key == 'j' and self.cur_y < self.max_y - 3:
-            self.cur_y += 1
-        elif key == 'k' and self.cur_y > 1:
-            self.cur_y -= 1
-        elif key == 'q':  # Quit command
+        if key == 'h' and self.direction != 'right':
+            self.direction = 'left'
+        elif key == 'j' and self.direction != 'up':
+            self.direction = 'down'
+        elif key == 'k' and self.direction != 'down':
+            self.direction = 'up'
+        elif key == 'l' and self.direction != 'left':
+            self.direction = 'right'
+        elif key == 'q':
             return True
-        return False
-             
+        else:
+            return False
 
     def update_game(self):
         # Update screen
         # move snake
+        # get the current head position
+        self.cur_y, self.cur_x = self.snake_body[0]
+        # update the current head position based on direction
+        if self.direction == 'left':
+            self.cur_x -= 1
+        elif self.direction == 'right':
+            self.cur_x += 1
+        elif self.direction == 'up':
+            self.cur_y -= 1
+        elif self.direction == 'down':
+            self.cur_y += 1
+        # update the snake body
+        self.snake_body.insert(0, (self.cur_y, self.cur_x))
         # check for collisions
         # check and update food
         # return true if game over, else false
-        pass
 
     def render_game(self):
         # Render snake
-        self.stdscr.addstr(self.cur_y, self.cur_x, ' ', self.bright_red)  # Draw the cursor in orange
-        # Render food
-        self.stdscr.addstr(self.food[0], self.food[1], '@', curses.color_pair(3) | curses.A_BOLD) 
+        self.stdscr.addstr(self.snake_body[0][0], self.snake_body[0][1], '🦋', self.blue) 
+        # Render when food is eaten
+        self.stdscr.addstr(self.food[0], self.food[1], '🍒', curses.color_pair(3) | curses.A_BOLD) 
+        # Render score
 
     def display_end_game_screen(self):
         # Display game over message
@@ -78,7 +97,7 @@ class Snake:
         play_again_y = self.max_y // 2 + 1
 
         # Print the messages
-        self.stdscr.addstr(game_over_msg_y, (self.max_x - len(game_over_msg)) // 2, game_over_msg, self.bright_red)
+        self.stdscr.addstr(game_over_msg_y, (self.max_x - len(game_over_msg)) // 2, game_over_msg, self.red)
         self.stdscr.addstr(play_again_y, (self.max_x - len(play_again)) // 2, play_again)
         self.stdscr.refresh() # refresh screen to display the messages
 
@@ -103,7 +122,7 @@ class Snake:
         # Display score (top middle)
         score_text = f"Score: {self.score}"
         score_x_pos = self.max_x // 2 - len(score_text) // 2
-        self.stdscr.addstr(0, score_x_pos, score_text, curses.color_pair(1))
+        self.stdscr.addstr(0, score_x_pos, score_text, self.magenta)
         
     def display_controls(self):
         controls = [('q', ':Quit'), ('h', ':Left'), ('j', ':Down'), ('k', ':Up'), ('l', ':Right')]

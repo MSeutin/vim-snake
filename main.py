@@ -4,10 +4,13 @@ from snake import Snake
 def main(stdscr):
     # colors 
     curses.start_color()
-    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)  # Blue text
-    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_RED)   # Orange text (using red as closest)
-    curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK)   # Green
-    bright_red = curses.color_pair(2) | curses.A_BOLD
+    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_RED)  # Blue text
+    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)   # Green text, black background
+    curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)   # Yellow text, black background
+    curses.init_pair(4, curses.COLOR_MAGENTA, curses.COLOR_BLACK)   # Magenta text, black background
+    curses.init_pair(5, curses.COLOR_CYAN, curses.COLOR_BLACK)   # Cyan text, black background
+    curses.init_pair(6, curses.COLOR_RED, curses.COLOR_BLACK)   # Red text, black background
+   
 
     # Initialize curses
     curses.curs_set(0)  # Hide cursor
