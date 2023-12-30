@@ -12,6 +12,9 @@ class Snake:
         self.snake_body = [(self.max_y // 2, self.max_x // 2)]
         self.direction = 'right'
         self.collision = False
+        self.food_eaten = False
+        self.food_eaten_time = 0
+        self.flash_duration = 0.8
         self.FRAME_RATE = 5
         self.blue = curses.color_pair(1) | curses.A_BOLD
         self.green = curses.color_pair(2) | curses.A_BOLD
@@ -27,6 +30,7 @@ class Snake:
         self.score = 0 # reset score
         self.direction = 'right' # reset direction
         self.collision = False # reset collision flag
+        self.FRAME_RATE = 5
 
         self.max_y, self.max_x = self.stdscr.getmaxyx()
         center_y, center_x = self.max_y // 2, self.max_x // 2 # center snake
@@ -82,7 +86,7 @@ class Snake:
             new_head = (head_y, head_x + 1)
         elif self.direction == 'up':
             new_head = (head_y - 1, head_x)
-        elif self.direction == 'down':
+        elif self.direction == 'down' and head_y < self.max_y - 3:
             new_head = (head_y + 1, head_x)
         # update the snake body
         self.snake_body.insert(0, new_head)
@@ -92,32 +96,44 @@ class Snake:
         # return true if game over, else false
 
     def check_food(self):
+        near_food = [(self.food[0] + 1, self.food[1]), (self.food[0] - 1, self.food[1]), (self.food[0], self.food[1] + 1), (self.food[0], self.food[1] - 1)]
         # check if snake head is on food
-        if self.snake_body[0] == self.food:
-            self.score += 1 # increment score
-            self.FRAME_RATE += 1 # increase frame rate
+        if self.snake_body[0] in near_food:
             self.place_food() # place new food
+            self.score += 1 # increment score
+            self.food_eaten = True
+            self.food_eaten_time = time.time() # set food eaten time
             return True
         
     def render_game(self):
+        current_time = time.time()
         # Clear snake body
-        for y,x in self.snake_body:
-            self.stdscr.addstr(y, x, 'X', curses.A_BOLD)
+        for y, x in self.snake_body:
+            if self.food_eaten and current_time - self.food_eaten_time <= self.flash_duration:
+                # Flash the head in a different color
+                self.stdscr.addstr(y, x, 'X', self.red | curses.A_BOLD)
+            else:
+                # Normal rendering
+                self.stdscr.addstr(y, x, 'X', self.green | curses.A_BOLD)
         # Render when food is eaten
         self.stdscr.addstr(self.food[0], self.food[1], '🍒', curses.A_BOLD) 
+        self.food_eaten = False
 
     def display_end_game_screen(self):
         # Display game over message
         self.stdscr.clear()
         game_over_msg = "G A M E  O V E R"
         play_again = "Play Another Game (y / n) ?"
+        score = f"YOUR SCORE: {self.score}"
 
         # Ensure the message positions are within the screen bounds
         self.max_y, self.max_x = self.stdscr.getmaxyx()
         game_over_msg_y = self.max_y // 2 - 1
         play_again_y = self.max_y // 2 + 1
+        score_y = 2
 
         # Print the messages
+        self.stdscr.addstr(score_y, (self.max_x - len(score)) // 2, score, self.yellow)
         self.stdscr.addstr(game_over_msg_y, (self.max_x - len(game_over_msg)) // 2, game_over_msg, self.red)
         self.stdscr.addstr(play_again_y, (self.max_x - len(play_again)) // 2, play_again)
         self.stdscr.refresh() # refresh screen to display the messages
