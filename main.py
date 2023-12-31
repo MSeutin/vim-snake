@@ -4,12 +4,10 @@ from snake import Snake
 def main(stdscr):
     # colors 
     curses.start_color()
-    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)  # Blue text
-    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)   # Green text, black background
-    curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)   # Yellow text, black background
-    curses.init_pair(4, curses.COLOR_MAGENTA, curses.COLOR_BLACK)   # Magenta text, black background
-    curses.init_pair(5, curses.COLOR_CYAN, curses.COLOR_BLACK)   # Cyan text, black background
-    curses.init_pair(6, curses.COLOR_RED, curses.COLOR_BLACK)   # Red text, black background
+    curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_BLACK)  # Black text
+    curses.init_pair(2, curses.COLOR_RED, curses.COLOR_RED)   # Red text, black background
+    curses.init_pair(3, curses.COLOR_BLUE, curses.COLOR_BLUE)   # Blue
+    curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_GREEN)   # Green
    
 
     # Initialize curses
@@ -18,10 +16,9 @@ def main(stdscr):
 
     # Declare a snake object
     snake = Snake(stdscr)
-
+  
     # Game Loop
     while True:
-        stdscr.clear() # clear screen
             
         # Wait for next input
         try:
@@ -30,26 +27,23 @@ def main(stdscr):
             key = '' 
             
         # Input Handling
-        if snake.input_handler(key):
+        if snake.input_handler(key) or snake.snake_collision():
             snake.display_end_game_screen()
-            if snake.end_game:
+        
+        # Break if game over
+        if snake.end_game:
                 break
 
-        # Check for snake collision
-        if snake.snake_collision():
-            snake.display_end_game_screen()
-            if snake.end_game:
-                break
-            
         # Update & Render Game
         snake.update_game()
         snake.render_game()
         
-        # Display Elements
-        snake.display_fixed_elements()
+        # Refresh only the parts of the screen that have changed
+        stdscr.noutrefresh()
+        snake.stdscr.noutrefresh()  # snake has its own window 
+        curses.doupdate()
         
-        # Refresh screen & wait
-        stdscr.refresh()
+        # Delay for specified time
         snake.time_delay()
         
 
@@ -74,3 +68,19 @@ if __name__ == '__main__':
 # Update Method:
 
 # Flesh out the update_game method with the actual game logic. This is where you'll handle things like the movement of the snake, checking for collisions, and updating the game state.
+
+# Add another class for the food object. This will make it easier to handle the food logic separately from the snake logic.
+
+# Add a box around the game area.
+
+# when box is hit, go to display_end_game_screen method
+
+# Add multiple food items
+
+# Maybe add a move vim commands
+
+# test
+
+# package and ship
+
+# post online for $5
