@@ -57,7 +57,7 @@ class Snake:
         if (head_y, head_x) in self.snake_body[1:]:
             self.collision = True
             return True
-        elif head_y <= 0 or head_y >= self.max_y - 1 or head_x <= 0 or head_x >= self.max_x - 1:
+        elif head_y <= 1 or head_y >= self.max_y - 1 or head_x <= 1 or head_x >= self.max_x - 1:
             self.collision = True
             return True
         else:
@@ -81,6 +81,7 @@ class Snake:
     def update_game(self):
         self.clear_snake()
         head_y, head_x = self.snake_body[0]
+        new_head = (head_y, head_x)
         # update the current head position based on direction
         if self.direction == 'left':
             new_head = (head_y, head_x - 1)
@@ -88,7 +89,7 @@ class Snake:
             new_head = (head_y, head_x + 1)
         elif self.direction == 'up':
             new_head = (head_y - 1, head_x)
-        elif self.direction == 'down' and head_y < self.max_y - 3:
+        elif self.direction == 'down':
             new_head = (head_y + 1, head_x)
         # update the snake body
         self.snake_body.insert(0, new_head)
@@ -165,7 +166,7 @@ class Snake:
 
 
     def display_fixed_elements(self):
-        self.display_logo()
+        # self.display_logo()
         self.display_controls()
 
     def render_score(self):
@@ -178,7 +179,7 @@ class Snake:
         controls = [('q', ':Quit'), ('h', ':Left'), ('j', ':Down'), ('k', ':Up'), ('l', ':Right')]
         x = 1
         for key, text in controls:
-            self.stdscr.addstr(self.max_y - 1, x, key, curses.color_pair(3) | curses.A_BOLD)
+            self.stdscr.addstr(self.max_y -1, x, key, curses.color_pair(3) | curses.A_BOLD)
             x += len(key)
             self.stdscr.addstr(self.max_y - 1, x, text)
             x += len(text) + 2
