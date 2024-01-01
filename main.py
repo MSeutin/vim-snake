@@ -2,20 +2,39 @@ import curses
 from snake import Snake
 
 def main(stdscr):
-    # colors 
+    # Start colors in curses
     curses.start_color()
-    curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_BLACK)  # Black text
-    curses.init_pair(2, curses.COLOR_RED, curses.COLOR_RED)   # Red text, black background
-    curses.init_pair(3, curses.COLOR_BLUE, curses.COLOR_BLUE)   # Blue
-    curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_GREEN)   # Green
-   
+    curses.use_default_colors()
+    # Initialize color pairs
+    canvas_background = curses.COLOR_WHITE  # You can choose any color
+    curses.init_pair(1, curses.COLOR_RED, canvas_background)
+    curses.init_pair(2, curses.COLOR_BLUE, canvas_background)
+    curses.init_pair(3, curses.COLOR_GREEN, canvas_background)
+    curses.init_pair(4, curses.COLOR_YELLOW, canvas_background)
+    curses.init_pair(5, curses.COLOR_MAGENTA, canvas_background)
+    curses.init_pair(6, curses.COLOR_CYAN, canvas_background)
+    curses.init_pair(7, curses.COLOR_WHITE, canvas_background)
+    curses.init_pair(8, curses.COLOR_BLACK, curses.COLOR_BLACK)
+    curses.init_pair(9, curses.COLOR_RED, curses.COLOR_RED)
+    curses.init_pair(10, curses.COLOR_BLACK, canvas_background)
+    # Set the default background for the stdscr window
+    stdscr.bkgd(' ', curses.color_pair(10))
 
     # Initialize curses
     curses.curs_set(0)  # Hide cursor
     stdscr.nodelay(True)  # Make getkey() non-blocking
+    stdscr.keypad(True)  # Enable keypad mode to capture arrow keys
 
     # Declare a snake object
-    snake = Snake(stdscr)
+    try:
+        snake = Snake(stdscr)
+    except Exception:
+            # End curses mode and reset terminal to original state
+            curses.endwin()
+            print('Make your terminal window bigger!')
+            input('Press Enter to exit...')
+            # Exit the program
+            quit()
   
     # Game Loop
     while True:
