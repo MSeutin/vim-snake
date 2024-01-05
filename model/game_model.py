@@ -5,7 +5,7 @@ class GameModel:
     def __init__ (self, max_y, max_x):
         self.max_y = max_y
         self.max_x = max_x
-        self.snake_body = [(max_y // 2, max_x // 4), (max_y // 2, max_x // 4 - 1), (max_y // 2, max_x // 4 - 2)]
+        self.snake_body = []
         self.food = (0,0)
         self.end_game = False
         self.score = 0
@@ -20,7 +20,7 @@ class GameModel:
         self.direction = 'right' # reset direction
         self.collision = False # reset collision flag
         self.food_eaten = False
-        self.snake_body = [(self.max_y // 2, self.max_x // 2)]
+        self.snake_body = [(self.max_y // 2, self.max_x // 4), (self.max_y // 2, self.max_x // 4 - 1), (self.max_y // 2, self.max_x // 4 - 2)] 
         self.place_food()
         
     def place_food(self):
@@ -70,8 +70,6 @@ class GameModel:
             return 'quit'
         
     def update_game(self):
-        if self.snake_collision():
-            self.end_game = True
         head_y, head_x = self.snake_body[0]
         new_head = (head_y, head_x)
         # update the current head position based on direction

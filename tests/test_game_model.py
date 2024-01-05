@@ -36,9 +36,6 @@ def test_game_view(stdscr):
                 game_view.view_reset()  # Reset the view for a new game
                 continue  # Start a new game loop       
 
-        # Delay for specified time
-        time.sleep(1 / 10)
-
 if __name__ == "__main__":
     curses.wrapper(test_game_view)
 

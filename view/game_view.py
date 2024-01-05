@@ -1,11 +1,12 @@
 import curses
-import time
-import random
 
 class GameView:
     def __init__ (self, model, stdscr):
         self.model = model
         self.stdscr = stdscr
+        self.create_window()
+        self.timeout = 100  # Starting timeout value in milliseconds
+        self.window.timeout(self.timeout)
         self.create_window()
         
     def create_window(self):
@@ -60,6 +61,10 @@ class GameView:
         self.render_score()  # Display score
         self.display_controls()
         self.window.refresh() 
+        
+    def change_timeout(self, new_timeout):
+        self.timeout = new_timeout
+        self.window.timeout(self.timeout)
 
     def render_game(self):
         self.window.clear()
@@ -67,7 +72,13 @@ class GameView:
         self.clear_snake() # Clear the snake from the previous frame
         # Render snake
         for segment in self.model.snake_body:
-            self.window.addch(segment[0], segment[1], curses.ACS_CKBOARD, self.snake_color)
+            y, x = segment
+            if 0 <= y < self.max_y and 0 <= x < self.max_x:
+                try:
+                    self.window.addch(y, x, curses.ACS_CKBOARD, self.snake_color)
+                except curses.error:
+                    pass  # Ignore errors if snake is out of bounds
+
 
         # Render food
         if self.model.food:  # Check if food position is defined
@@ -85,6 +96,14 @@ class GameView:
         # Clear only the last segment of the snake's body
         snake_tail = self.model.snake_body[-1]
         self.window.addch(snake_tail[0], snake_tail[1], ' ')
+
+    def clear_snake(self):
+        if not self.model.food_eaten:
+            # Clear only the last segment of the snake's body
+            snake_tail = self.model.snake_body[-1]
+            self.window.addch(snake_tail[0], snake_tail[1], ' ')
+            self.model.food_eaten = False  # Reset food eaten flag
+
         
     
     def display_end_game_screen(self):
