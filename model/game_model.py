@@ -46,12 +46,11 @@ class GameModel:
         head_y, head_x = self.snake_body[0]
         # check if snake collides with itself
         if (head_y, head_x) in self.snake_body[1:]:
+            print("ERROR IMMEDIATE COLLISION")
             self.collision = True
-            self.end_game = True
             return True
-        elif head_y <= 1 or head_y >= self.max_y - 1 or head_x <= 1 or head_x >= self.max_x - 1:
+        if head_y <= 1 or head_y >= self.max_y - 1 or head_x <= 1 or head_x >= self.max_x - 1:
             self.collision = True
-            self.end_game = True
             return True
         else:
             return False
@@ -86,6 +85,8 @@ class GameModel:
         # check and update food
         if not self.check_food():
             self.snake_body.pop()
+        if self.snake_collision():
+            self.end_game = True
 
         
         

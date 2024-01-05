@@ -4,9 +4,7 @@ class GameView:
     def __init__ (self, model, stdscr):
         self.model = model
         self.stdscr = stdscr
-        self.create_window()
-        self.timeout = 100  # Starting timeout value in milliseconds
-        self.window.timeout(self.timeout)
+        self.create_window() # Starting timeout value in milliseconds
         self.create_window()
         
     def create_window(self):
@@ -61,10 +59,6 @@ class GameView:
         self.render_score()  # Display score
         self.display_controls()
         self.window.refresh() 
-        
-    def change_timeout(self, new_timeout):
-        self.timeout = new_timeout
-        self.window.timeout(self.timeout)
 
     def render_game(self):
         self.window.clear()

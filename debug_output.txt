@@ -1,0 +1,17 @@
+[?1049h[1;24r(B[m[4l[?7h[?1l>Traceback (most recent call last):
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/curses/__init__.py", line 78, in wrapper
+    cbreak()
+_curses.error: cbreak() returned ERR
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/Users/michael/Documents/02_dev/35_shell-games/vim-snake/tests/test_game_controller.py", line 32, in <module>
+    curses.wrapper(test_game_controller)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/curses/__init__.py", line 100, in wrapper
+    nocbreak()
+_curses.error: nocbreak() returned ERR
