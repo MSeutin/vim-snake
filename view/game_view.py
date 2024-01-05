@@ -10,10 +10,11 @@ class GameView:
         
     def create_window(self):
         self.stdscr.nodelay(True)
-        self.stdscr.keypad(True)
         self.max_y, self.max_x = self.stdscr.getmaxyx()
         self.window = curses.newwin(self.max_y, self.max_x, 0, 0)
         self.window.border(0)
+        self.window.keypad(True)
+        self.window.nodelay(True)
         self.initialize_ui()
         
     def initialize_ui(self):
@@ -56,6 +57,7 @@ class GameView:
         # Initialize static ui elements
         self.window.clear()  # Clear the screen
         self.window.border(0)  # Draw border
+        self.render_score()  # Display score
         self.display_controls()
         self.window.refresh() 
 
@@ -93,7 +95,7 @@ class GameView:
         score = f"YOUR SCORE: {self.model.score}"
 
         # Ensure the message positions are within the screen bounds
-        self.max_y, self.max_x = self.stdscr.getmaxyx()
+        self.max_y, self.max_x = self.window.getmaxyx()
         game_over_msg_y = self.max_y // 2 - 1
         play_again_y = self.max_y // 2 + 1
         score_y = 2
@@ -105,6 +107,12 @@ class GameView:
         
         self.display_logo()
         self.window.refresh() # refresh screen to display the messages
+        while True:
+            response = self.window.getch()
+            if response in [ord('y'), ord('Y')]:
+                return 'y'
+            elif response in [ord('n'), ord('N')]:
+                return 'n'
 
     def render_score(self):
         # Display score (top middle)

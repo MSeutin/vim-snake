@@ -1,4 +1,5 @@
 import random
+from curses import KEY_RIGHT, KEY_LEFT, KEY_DOWN, KEY_UP
 
 class GameModel:
     def __init__ (self, max_y, max_x):
@@ -46,27 +47,31 @@ class GameModel:
         # check if snake collides with itself
         if (head_y, head_x) in self.snake_body[1:]:
             self.collision = True
+            self.end_game = True
             return True
         elif head_y <= 1 or head_y >= self.max_y - 1 or head_x <= 1 or head_x >= self.max_x - 1:
             self.collision = True
+            self.end_game = True
             return True
         else:
             return False
     
     def input_handler(self, key):
         # Update cursor position based on key press
-        if (key == 'h' or key == 'KEY_LEFT') and self.direction != 'right':
+        if (key == ord('h') or key == KEY_LEFT) and self.direction != 'right':
             return 'left'
-        elif (key == 'j' or key == 'KEY_DOWN') and self.direction != 'up':
+        elif (key == ord('j') or key == KEY_DOWN) and self.direction != 'up':
             return 'down'
-        elif (key == 'k' or key == 'KEY_UP') and self.direction != 'down':
+        elif (key == ord('k') or key == KEY_UP) and self.direction != 'down':
             return 'up'
-        elif (key == 'l' or key == 'KEY_RIGHT') and self.direction != 'left':
+        elif (key == ord('l') or key == KEY_RIGHT) and self.direction != 'left':
             return 'right'
-        elif key == 'q':
+        elif key == ord('q'):
             return 'quit'
         
     def update_game(self):
+        if self.snake_collision():
+            self.end_game = True
         head_y, head_x = self.snake_body[0]
         new_head = (head_y, head_x)
         # update the current head position based on direction
