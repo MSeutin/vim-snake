@@ -1,6 +1,6 @@
 import curses
-from game_model import GameModel
-from game_view import GameView
+from model.game_model import GameModel
+from view.game_view import GameView
 
 def main(stdscr):
 

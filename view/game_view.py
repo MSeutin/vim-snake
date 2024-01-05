@@ -6,10 +6,21 @@ class GameView:
     def __init__ (self, model, stdscr):
         self.model = model
         self.stdscr = stdscr
-        self.max_y, self.max_x = stdscr.getmaxyx()
+        self.create_window()
+        
+    def create_window(self):
+        self.stdscr.nodelay(True)
+        self.stdscr.keypad(True)
+        self.max_y, self.max_x = self.stdscr.getmaxyx()
+        self.window = curses.newwin(self.max_y, self.max_x, 0, 0)
+        self.window.border(0)
         self.initialize_ui()
         
     def initialize_ui(self):
+        try:
+            curses.curs_set(0)
+        except curses.error:
+            pass  # Fails silently if the terminal does not support hiding the cursor
         # Start colors in curses
         curses.start_color()
         curses.use_default_colors()
@@ -39,32 +50,44 @@ class GameView:
         self.controls_color_reg = curses.color_pair(10)
         self.controls_color_bold = curses.color_pair(10) | curses.A_BOLD
         # Set the default background for the stdscr window
-        self.stdscr.bkgd(' ', curses.color_pair(10))
+        self.window.bkgd(' ', curses.color_pair(10))
       
     def view_reset(self):
-        self.stdscr.clear()  # Clear the screen
-        self.stdscr.box()    # Draw the game border
-        self.display_fixed_elements()
-        self.stdscr.refresh() 
+        # Initialize static ui elements
+        self.window.clear()  # Clear the screen
+        self.window.border(0)  # Draw border
+        self.display_controls()
+        self.window.refresh() 
+
+    def render_game(self):
+        self.window.clear()
+        self.window.border(0)
+        self.clear_snake() # Clear the snake from the previous frame
+        # Render snake
+        for segment in self.model.snake_body:
+            self.window.addch(segment[0], segment[1], curses.ACS_CKBOARD, self.snake_color)
+
+        # Render food
+        if self.model.food:  # Check if food position is defined
+            self.window.addch(self.model.food[0], self.model.food[1], curses.ACS_CKBOARD, self.food_color)
+
+        # Render score and controls
+        self.render_score()
+        self.display_controls()
+
+        # Refresh the screen to display the updates
+        self.window.refresh()
+
 
     def clear_snake(self):
-        # Iterate over the snake's body except the head
-        for y, x in self.model.snake_body:
-            try:
-                self.stdscr.addstr(y, x, ' ')
-            except curses.error:
-                pass # Ignore error when snake is out of bounds
-            
-        # Clear previous food position
-        if self.model.food: # Check if food position is defined
-            try:
-                self.stdscr.addstr(self.model.food[0], self.model.food[1], ' ')
-            except curses.error:
-                pass # Ignore error when food is out of bounds
+        # Clear only the last segment of the snake's body
+        snake_tail = self.model.snake_body[-1]
+        self.window.addch(snake_tail[0], snake_tail[1], ' ')
+        
     
     def display_end_game_screen(self):
         # Display game over message
-        self.stdscr.clear()
+        self.window.clear()
         game_over_msg = "G A M E  O V E R"
         play_again = "Play Another Game (y / n) ?"
         score = f"YOUR SCORE: {self.model.score}"
@@ -76,29 +99,23 @@ class GameView:
         score_y = 2
 
         # Print the messages
-        self.stdscr.addstr(score_y, (self.max_x - len(score)) // 2, score, self.blue)
-        self.stdscr.addstr(game_over_msg_y, (self.max_x - len(game_over_msg)) // 2, game_over_msg, self.red)
-        self.stdscr.addstr(play_again_y, (self.max_x - len(play_again)) // 2, play_again)
+        self.window.addstr(score_y, (self.max_x - len(score)) // 2, score, self.blue)
+        self.window.addstr(game_over_msg_y, (self.max_x - len(game_over_msg)) // 2, game_over_msg, self.red)
+        self.window.addstr(play_again_y, (self.max_x - len(play_again)) // 2, play_again)
         
         self.display_logo()
-        self.stdscr.refresh() # refresh screen to display the messages
-
-    def display_fixed_elements(self):
-        # self.display_logo()
-        self.display_controls()
+        self.window.refresh() # refresh screen to display the messages
 
     def render_score(self):
         # Display score (top middle)
         score_text = f"Score: {self.model.score}"
         score_x_pos = self.max_x // 2 - len(score_text) // 2
-        self.stdscr.addstr(0, score_x_pos, score_text, self.blue)
+        self.window.addstr(0, score_x_pos, score_text, self.blue)
 
     def display_controls(self):
         # Define the controls and their descriptions
-        # controls = [('[q]', ':Quit'), ('[h]', '\u2190'), ('[j]', '\u2193'), ('[k]', '\u2191'), ('[l]', '\u2192')]
         controls = '  [q]:quit    Vim cmd:  [h] \u2190  [j] \u2193  [k] \u2191  [l] \u2192  '
-        
-        self.stdscr.addstr(self.max_y - 1, 1, controls, self.controls_color_reg)
+        self.window.addstr(self.max_y - 1, 1, controls, self.controls_color_reg)
 
     def display_logo(self):
         # Display game name (bottom middle)
@@ -106,5 +123,5 @@ class GameView:
         author = "@frenchmike"
         logo_x_pos = self.max_x // 2 - len(logo) // 2
         author_x_pos = self.max_x // 2 - len(author) // 2
-        self.stdscr.addstr(self.max_y-5, logo_x_pos, logo, self.cyan)
-        self.stdscr.addstr(self.max_y-4, author_x_pos, author, self.cyan)
+        self.window.addstr(self.max_y-5, logo_x_pos, logo, self.cyan)
+        self.window.addstr(self.max_y-4, author_x_pos, author, self.cyan)

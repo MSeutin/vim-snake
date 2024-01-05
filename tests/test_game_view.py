@@ -1,5 +1,5 @@
 import curses
-from game_view import GameView
+from view.game_view import GameView
 
 # Mock GameModel for testing
 class MockGameModel:
@@ -9,14 +9,29 @@ class MockGameModel:
         self.score = 0
 
 def test_game_view(stdscr):
+    stdscr.nodelay(True)  # Make getkey() non-blocking
     mock_model = MockGameModel()
     game_view = GameView(mock_model, stdscr)
-
+    
+    # render static elements
     game_view.view_reset()
-    game_view.clear_snake()
-    # ... call other methods you want to test ...
 
-    stdscr.getch()  # Wait for a key press to visually inspect the screen
+    while True:
+        # Render dynamic elements
+        game_view.render_game()
+
+        # Handle input
+        key = stdscr.getch()
+        if key == ord('q'):  # Exit on 'q' key
+            break
+        elif key != -1:
+            # Handle other keys if necessary
+            pass
+
+        # Efficiently refresh the screen
+        stdscr.noutrefresh()
+        curses.doupdate()
 
 if __name__ == "__main__":
     curses.wrapper(test_game_view)
+
