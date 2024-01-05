@@ -59,7 +59,7 @@ def main(stdscr):
         
         # Refresh only the parts of the screen that have changed
         stdscr.noutrefresh()
-        snake.stdscr.noutrefresh()  # snake has its own window 
+        # snake.stdscr.noutrefresh()  # snake has its own window 
         curses.doupdate()
         
         # Delay for specified time
